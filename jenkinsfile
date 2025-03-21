@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HUB_USER = 'your_dockerhub_username'
+        DOCKER_HUB_PASS = 'your_dockerhub_password'
+        DOCKER_REPO = "${DOCKER_HUB_USER}/hello-world-war"
+        DOCKER_TAG = "latest"
+        CONTAINER_NAME = "hello-world-container"
+    }
+
+    stages {
+        
+        stage('Checkout') {
+            steps {
+                echo 'Cloning repository...'
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                sh "docker build -t ${DOCKER_REPO}:${DOCKER_TAG} ."
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                echo 'Logging in to Docker Hub...'
+                sh """
+                echo ${DOCKER_HUB_PASS} | docker login -u ${DOCKER_HUB_USER} --password-stdin
+                """
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                echo 'Pushing Docker image to Docker Hub...'
+                sh "docker push ${DOCKER_REPO}:${DOCKER_TAG}"
+            }
+        }
+
+        stage('Remove Existing Container') {
+            steps {
+                echo 'Removing old container (if exists)...'
+                sh """
+                docker rm -f ${CONTAINER_NAME} || true
+                """
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                echo 'Running Docker container...'
+                sh """
+                docker run -d --name ${CONTAINER_NAME} -p 8080:8080 ${DOCKER_REPO}:${DOCKER_TAG}
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline completed!"
+        }
+        success {
+            echo "Container running at http://localhost:8080"
+        }
+        failure {
+            echo "Pipeline failed!"
+        }
+    }
+}
