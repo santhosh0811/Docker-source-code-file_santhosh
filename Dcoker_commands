@@ -1,0 +1,66 @@
+Docker command
+ 
+docker build = Build an image from the current directory
+example:
+docker build -t myapp .
+-t → Tags the image with the name myapp.
+. → The build context (current directory).
+
+docekr run = 
+example:
+docker run nginx
+docker run -d nginx
+docker run -it ubuntu bash
+docker run -d -p 8080:80 nginx
+docker run --name my_nginx -d nginx
+docker run -v /my/data:/app/data nginx
+
+
+docker run -d --name my_app -p 5000:5000 -v /my/data:/app/data flask-app
+
+docekr images = This will display the list of locally stored Docker images
+
+docker ps = To list running Docker containers
+
+docker ps -a = Displays all Docker containers, including stopped and running
+
+docker ps -q = Displays only the container IDs of the running Docker containers
+
+docker ps -aq = Displays only the container IDs of all Docker containers, including:Running containers, Stopped container
+
+docker rm -f $(docker ps -q) = Forcefully removes all running Docker containers
+
+docker rm -f $(docker ps -aq) = Forcefully removes all Docker containers, including:Running containers,Stopped containers
+
+docker rm $(docker ps -aq --filter "status=exited")  = To delete all stopped Docker containers
+
+docker container prune = To delete all stopped Docker containers
+
+docker rmi <IMAGE_ID or IMAGE_NAME>  = To remove a Docker image
+
+docker rmi $(docker images -q) = This removes every image on your system
+
+docker exec -it containerID = get inside the running container
+
+docker system prune --all = it will remove all uused docker objects(contianer,images,network,volumes,cache)
+
+docker image prune = removes all dangling or unsued images.
+
+docker image --filter dangling=true  = listing all dangling images
+
+docker rmi $(docker image -q --filter dangling=true) = deleting all dangling images
+
+docker volume create <volume-name> = To create a volume
+
+docker commit <container_name> new_image_name   = Commit the running container to create a new image
+
+docker inspect = if we want to get more information on container or volme or network
+example:
+docker inspect <CONTAINER_ID or CONTAINER_NAME>
+docker inspect <VOLUME_NAME>
+docker inspect <NETWORK_NAME or NETWORK_ID>
+
+docker network ls = To see all networks
+docker volume ls  = Lists all Docker volumes on your system
+
+docker ps -a --filter ancestor="image-name" = to list the container created by particular images
